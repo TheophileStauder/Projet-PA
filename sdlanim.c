@@ -1,129 +1,81 @@
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include "fonctions_fichiers.h"
+#include "fonctions_fichiers.c"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 #include <time.h>
 #include <math.h>
-#define SIZE 32 
+#define SIZE_SPRITE 32 
 #define WIDTH 640 
 #define HEIGHT 320 
 
-char** allouer_tab_2D(int n, int m){
-	int i;
-	char ** tab = malloc(n*sizeof(char*));
-	
-	
-	for(i = 0 ; i < n ; i++){
-		tab[i] = malloc(m*sizeof(char*));
-	}
-	return tab;
-}
 
 
 
-void desallouer_tab_2D(char** tab, int n){
-
-	int j;
-	for(j = 0; j < n ; j++){
-		free(tab[j]);
-	}
-	free(tab);
-}
-
-void afficher_tab_2D(char** tab, int n, int m){
-	 int i , j;
-	 
-	 for (i = 0 ; i < n ; i++){
-		for( j = 0 ; j < m ; j ++){
-			printf("%d",tab[i][m] );
-		  
-		}
-	 }
-}
-
-
-char** lire_fichier(const char* nomFichier){
-	
-	int c , n = 0;
-	char** tab = allouer_tab_2D(13,6);
-	int i = 0;
-	int j = 0;
-	
-	FILE* ptrFichier = fopen(nomFichier, "r");
-	
-	if (ptrFichier==NULL)  
-		perror("Erroropeningfile");  
-	else{
-
-		do{
-		    c = fgetc(ptrFichier);
-		    if(c=='\n'){
-		      printf("\n");
-
-		      i++; 
-		      j = 0 ;
-		    }
-		   
-		    if(c!=10 && c!=-1){
-			tab[i][j] = c;
-			n++ ;
-		    }
-		     if(c!='\n'){
-		      j++ ;
-                    }
-		}while(c != EOF);
-
-	}
-	fclose(ptrFichier);  
-	//printf("File contains %d caracteres\n",n);  
-	
-	return tab;
-  
-}
-
-
-void pause();
 
 
 int main(int argc, char *argv[])
 
 {
-  int i, j ;
-  char** tab = lire_fichier("ecrire") ;
+    int i, j ;
+    char** tab = lire_fichier("ecrire") ;
 
-    int continuer, colorkey ;
+    int colorkey ;
     int level = 1 ;
+    int continuer = 1 ;
         
-    SDL_Surface *ecran = NULL, *terre = NULL, *mur = NULL, *tank = NULL, *grass = NULL ;
+
+    /*Declaration des variables surfaces*/
+    SDL_Surface *ecran = NULL, *terre = NULL, *mur = NULL, *tank = NULL, *grass = NULL ,*tank_haut ,*tank_bas ,*tank_gauche ,*tank_droite;
     SDL_Rect pos, tankSrc ;//, posGrass ;
     SDL_Event event ;
     
-    SDL_Init(SDL_INIT_VIDEO); // Initialisation de la SDL
-
+    /*Initialisation de le SDL*/
+    SDL_Init(SDL_INIT_VIDEO); 
     
-   
-
-    continuer = 1 ;
-
-    ecran =SDL_SetVideoMode(WIDTH, HEIGHT, 32, SDL_HWSURFACE); // Ouverture de la fenêtre
+    /*Initialisation de l'écran*/
+    ecran = SDL_SetVideoMode(WIDTH, HEIGHT, 32, SDL_HWSURFACE | SDL_DOUBLEBUF); 
+    SDL_FillRect(ecran, NULL, SDL_MapRGB(ecran->format, 255, 255, 255)) ;
+    
+    /*Nom fenetre */
     SDL_WM_SetCaption("Jeu programmation avancée", NULL);
     
+    /*Permission des événements à répétitions*/
+    SDL_EnableKeyRepeat(10, 10) ;
+
+    /*Chargement des sprites*/
     terre = SDL_LoadBMP("terreBon.bmp") ;
     mur = SDL_LoadBMP("murBon.bmp") ;
-    tank = SDL_LoadBMP("tank.bmp") ;
+    tank_haut = SDL_LoadBMP("tank_haut.bmp") ;
+    tank_bas = SDL_LoadBMP("tank_bas.bmp") ;
+    tank_droite = SDL_LoadBMP("tank_droite.bmp") ;
+    tank_gauche = SDL_LoadBMP("tank_gauche.bmp") ;
     grass = SDL_LoadBMP("grass.bmp") ;
     
-    colorkey = SDL_MapRGB(ecran->format, 0, 0, 0);
-    SDL_SetColorKey(tank, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+    tank = tank_bas;
+
+    /*Gestion de la transparence des sprites*/
+    colorkey = SDL_MapRGB(ecran->format, 0,0,0);
+    SDL_SetColorKey(tank_droite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+    SDL_SetColorKey(tank_gauche, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+    SDL_SetColorKey(tank_bas, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
     
+    
+    /*Initialisation fiche sprite tank*/
     tankSrc.x = 0;
     tankSrc.y = 0;
-    tankSrc.w = SIZE;
-    tankSrc.h = SIZE;  
+    tankSrc.w = SIZE_SPRITE;
+    tankSrc.h = SIZE_SPRITE;  
+   
+    
+   
     /*
     posGrass.x = 0 ;
     posGrass.y = 0 ;
-*/
+    */
    
-    //position mur et terre
+    /*Chargement de la map, positionement des sprites mur et terre*/
     pos.x = 0 ;
     pos.y = 0 ;
     
@@ -137,17 +89,18 @@ int main(int argc, char *argv[])
                 SDL_BlitSurface(terre, NULL, ecran, &pos) ;
 
             }
-            pos.x = pos.x + SIZE ;
+            pos.x = pos.x + SIZE_SPRITE ;
         }
-        pos.y = pos.y + SIZE ;
+        pos.y = pos.y + SIZE_SPRITE ;
         pos.x = 0 ;
     }
-    pos.x = 0 ;
-    pos.y = 0 ;
     
+    /*Blitte du tank*/
+    //(Inutile car pos pas dans fenetre pour le moment)
     SDL_BlitSurface(tank, &tankSrc, ecran, &pos) ;
     
-    srand(time(NULL));
+
+    //srand(time(NULL));
     if (level){
       /*pos.x = (rand()%WIDTH/SIZE + 1) ;
       pos.y = (rand()%HEIGHT/SIZE + 1) ;  */
@@ -188,8 +141,8 @@ int main(int argc, char *argv[])
       level++ ;
     }
 
-/*
-    SDL_EnableKeyRepeat(10, 10) ;
+
+    
     while(continuer){
         
         SDL_WaitEvent(&event) ;
@@ -200,27 +153,49 @@ int main(int argc, char *argv[])
             case SDL_KEYDOWN :
                 switch(event.key.keysym.sym){
                     case SDLK_UP :
-                      //  if(tankSrc.y>=32){
-                        tankSrc.y -= SIZE ;
-                     //   }
+                     
+		      tank = tank_haut;
+		      tankSrc.y = 0;
+		      if (tankSrc.x >191){
+			tankSrc.x = 0 ;
+                       }
+                       tankSrc.x += SIZE_SPRITE;
+		       pos.y -= 2;
                         break ;
                     case SDLK_DOWN :
-                       // if (tankSrc.y <=288){
-                        tankSrc.y += SIZE ;
-                     //   }
+		      
+			  tank = tank_bas;
+			  tankSrc.y = 0;
+			  if (tankSrc.x >191){
+			  tankSrc.x = 0 ;
+			}
+			tankSrc.x += SIZE_SPRITE;
+			if (pos.y <= 290){
+			  pos.y += 2;
+			}
                         break ;
-                    case SDLK_RIGHT :
-                        if (tankSrc.w >=160){
-                            tankSrc.w = SIZE ;
-                        }
-                      //  if (tankSrc.x <= 6){
-                        tankSrc.x += SIZE ;
-                      //  }
+		    case SDLK_RIGHT :
+			tank = tank_droite;
+			tankSrc.x = 0; 
+                       if (tankSrc.y >191){
+			tankSrc.y = 0 ;
+                       }
+                       tankSrc.y += SIZE_SPRITE;
+		       if (pos.x <= 610){
+			 pos.x += 2;
+		       }
+		       
                         break ;
-                    case SDLK_LEFT :
-                        if (tankSrc.x >=32){
-                        tankSrc.x -= SIZE ;
-                        }
+                    
+		    case SDLK_LEFT :
+		      
+			tank = tank_gauche;
+			tankSrc.x = 0;
+                        if (tankSrc.y >191){
+			tankSrc.y = 0 ;
+                       }
+                       tankSrc.y += SIZE_SPRITE;
+		       pos.x -= 2;
                         break ;
                     default :
                         break ;
@@ -230,19 +205,25 @@ int main(int argc, char *argv[])
                         break ;
         }
         
-        SDL_FillRect(ecran, NULL, SDL_MapRGB(ecran->format, 255, 255, 255)) ;
-        SDL_BlitSurface(tank, &tankSrc, ecran, &tankSrc) ;
+        SDL_BlitSurface(tank, &tankSrc, ecran, &pos) ;
         SDL_Flip(ecran) ;
     }
-    */
-
     
+
 
     pause(); // Mise en pause du programme
 
+  
     
+    
+    
+    //desallouer_tab_2D(tab, 20,10);
+    SDL_FreeSurface(tank_droite) ;
+    SDL_FreeSurface(tank_gauche) ;
+    SDL_FreeSurface(tank_haut) ;
+    SDL_FreeSurface(tank_bas) ;
     SDL_FreeSurface(grass) ;
-    SDL_FreeSurface(tank) ;
+    //SDL_FreeSurface(tank) ;
     SDL_FreeSurface(mur) ;
     SDL_FreeSurface(terre) ;
     SDL_Quit(); // Arrêt de la SDL
@@ -255,35 +236,7 @@ int main(int argc, char *argv[])
 
  
 
-void pause()
 
-{
-
-    int continuer = 1;
-
-    SDL_Event event;
-
- 
-
-    while (continuer)
-
-    {
-
-        SDL_WaitEvent(&event);
-
-        switch(event.type)
-
-        {
-
-            case SDL_QUIT:
-
-                continuer = 0;
-
-        }
-
-    }
-
-}
 
 
 
