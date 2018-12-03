@@ -1,5 +1,4 @@
 #include <SDL/SDL.h>
-#include <SDL_image.h>
 #include "fonctions_fichiers.h"
 #include "fonctions_fichiers.c"
 #include "define.h"
@@ -42,7 +41,7 @@ int main(int argc, char *argv[])
     
     /*Permission des événements à répétitions*/ 
     SDL_EnableKeyRepeat(10, 10) ;        
-
+ 
     while(menuBoolean){
         SDL_WaitEvent(&event1); 
         switch(event1.type){    
@@ -59,8 +58,6 @@ int main(int argc, char *argv[])
 
   
    
-
-    pause(); 
 
     SDL_FreeSurface(menu);
     SDL_Quit(); // Arrêt de la SDL

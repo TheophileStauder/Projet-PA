@@ -211,43 +211,34 @@ int peutDeplacerTankGauche(char** tab, SDL_Rect posTank){
 }
 
 
-float calculCoeffDirBullet(SDL_Rect posTour , SDL_Rect posTank){
- 	float a = ((float)(posTank.y - posTour.y))/((float)(posTank.x - posTour.y));
- 	printf("coeffDir vaut : %f",a);
- 	return a;
+int calculA(SDL_Rect posTour , SDL_Rect posTank){
+  int copiePosTourX = posTour.x;
+  int copiePosTourY =  posTour.y;
+  int copiePosTankX = posTank.x;
+  int copiePosTankY = posTank.y;
+
+  return copiePosTankY-copiePosTourY;
 }
 
+int calculB(SDL_Rect posTour, SDL_Rect posTank){
+  int copiePosTourX = posTour.x;
+  int copiePosTourY =  posTour.y;
+  int copiePosTankX = posTank.x;
+  int copiePosTankY = posTank.y;
 
-float calculOrdOriBullet(SDL_Rect posTour, float coeffDir){
-	float temp = (float)coeffDir*posTour.x;
-	printf(" Temp vaut : %f",temp);
-	float b = posTour.y - (coeffDir*posTour.x);
-	printf(" Origine vaut : %f",b);
-	return b;
+
+  return copiePosTankX - copiePosTankY;
 }
 
-/*void affficheTour(char ** map,SDL_Rect posTour,SDL_Surface *tour,SDL_Surface *ecran){
-    int i,j;
-    int peutPasPoserTour = 1;
-    srand(time(NULL));
-    i = rand()%9+0;
-    j = rand()%19+0;
-    printf("Dans afficher tour : i = %d  et j = %d\n",i,j );
+int calculC(SDL_Rect posTour, SDL_Rect posTank){
+  int copiePosTourX = posTour.x;
+  int copiePosTourY =  posTour.y;
+  int copiePosTankX = posTank.x;
+  int copiePosTankY = posTank.y;
 
-    while(peutPasPoserTour){
-      if(map[i][j] == '1'){
-        posTour.x = i*SIZE_SPRITE;
-        posTour.y = j*SIZE_SPRITE;
 
-        SDL_BlitSurface(tour,NULL,ecran,&posTour);
-
-        peutPasPoserTour = 0;
-      }
-      i = rand()%9+0;
-      j = rand()%19+0;
-    }
-
-}*/
+  return -((copiePosTourX*copiePosTankY) + (copiePosTankX*copiePosTourY));
+}
 
 SDL_Rect* genereTourPos(char** map){
   
@@ -324,7 +315,7 @@ void jouer(){
     char** map = lire_fichier("ecrire") ;
     int continuer = 1;
     int compteur_droite = 0; 
-    int a,b;
+    int a,b,c;
     
 
     SDL_Surface *ecran = NULL, *terre = NULL, *mur = NULL, *tank = NULL, *grass = NULL ,*tank_haut = NULL,*tank_bas = NULL ,*tank_gauche = NULL,*tank_droite = NULL, *tour = NULL;
@@ -387,8 +378,20 @@ void jouer(){
     posFlag.y = 32;
     posFlag = genereFlagPos(map);
 
-    
-  
+
+    /*Pour les tests de tirs*/
+    tourTest.x = 5*32;
+    tourTest.y =0;
+
+    posBullet.x = 5.32;
+    posBullet.y = 0;
+
+    /*a = calculA(tourTest,posBullet);
+    b = calculB(tourTest,posBullet);
+    c = calculC(tourTest,posBullet);
+    int x = -(b*posBullet.y +c)/a;
+    int y = -(a*posBullet.x+c)/b;*/
+
 
     /* Boucle infini pour jouer tant qu'on a pas perdu ou arreter le programme*/
     while(continuer){
@@ -482,6 +485,12 @@ void jouer(){
         afficherMap(map,posMap,ecran,terre,mur);  
         afficherTour(tabPosTour,ecran,tour);
         
+        /*TEST*/
+        //posBullet.x = x;
+        //posBullet.y = y;
+        //SDL_BlitSurface(tour,NULL,ecran,&tourTest);
+        //SDL_BlitSurface(bullet,NULL,ecran,&posBullet);
+        /*TEST*/
         /*Verification si joueur a récupéré drapeau*/
         if(hasReached(posTank,posFlag)){
           posFlag = genereFlagPos(map);
