@@ -1,10 +1,13 @@
 #include <SDL/SDL.h>
-#include "fonctions_fichiers.h"
-#include "fonctions_fichiers.c"
+/*#include "fonctions_fichiers.h"
+#include "fonctions_fichiers.c"*/
+#include "jouer.c"
+#include "jouer.h"
+
 #include "define.h"
 #include <stdio.h>
 #include <stdlib.h> 
-#include <stdbool.h>  
+#include <stdbool.h>   
 #include <math.h>
 
 
@@ -12,11 +15,11 @@
 int main(int argc, char *argv[])   
 
 {
-   
-    
+            
+        
  
     /*Declaration des variables surfaces*/ 
-    SDL_Surface *ecran = NULL, *menu = NULL;   
+    SDL_Surface *ecran = NULL, *menu = NULL;     
     SDL_Rect posMenu;
 
 
@@ -27,7 +30,7 @@ int main(int argc, char *argv[])
      
     /*Initialisation de le SDL*/  
     SDL_Init(SDL_INIT_VIDEO);        
-      
+               
     /*Initialisation de l'écran*/
     ecran = SDL_SetVideoMode(WIDTH, HEIGHT, 32, SDL_HWSURFACE | SDL_DOUBLEBUF); 
     SDL_FillRect(ecran, NULL, SDL_MapRGB(ecran->format, 255, 255, 255)) ;
@@ -40,13 +43,18 @@ int main(int argc, char *argv[])
     SDL_WM_SetCaption("Jeu programmation avancée", NULL);     
     
     /*Permission des événements à répétitions*/ 
-    SDL_EnableKeyRepeat(10, 10) ;        
- 
+    SDL_EnableKeyRepeat(10, 10) ;      
+    /* position de la souris*/  
+    int x ;
+    int y ;
     while(menuBoolean){
         SDL_WaitEvent(&event1); 
         switch(event1.type){    
-            case SDL_MOUSEBUTTONDOWN :                 
-              jouer(); 
+            case SDL_MOUSEBUTTONDOWN :  
+              SDL_GetMouseState(&x, &y); 
+              if(x<=590 && x>= 50 && y >= 80 && y <= 230){              
+                jouer(); 
+            }
               break;
             case SDL_QUIT:
               menuBoolean = 0;     
@@ -57,7 +65,7 @@ int main(int argc, char *argv[])
     }
 
   
-   
+          
 
     SDL_FreeSurface(menu);
     SDL_Quit(); // Arrêt de la SDL
@@ -69,7 +77,7 @@ int main(int argc, char *argv[])
 
 }
 
- 
+      
 
 
 

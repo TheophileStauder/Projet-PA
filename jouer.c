@@ -1,6 +1,9 @@
 #include <SDL/SDL.h>
 #include "fonctions_fichiers.c"
+//#include "fonctions_fichiers.h"
 #include "jouer.h"
+#include "define.h"
+
 
 
 
@@ -12,9 +15,35 @@ void jouer(){
     int a,b;
     SDL_Rect* tabPosTour = genereTourPos(tab);
 
-	  SDL_Surface *ecran = NULL, *terre = NULL, *mur = NULL, *tank = NULL, *grass = NULL ,*tank_haut = NULL,*tank_bas = NULL ,*tank_gauche = NULL,*tank_droite = NULL, *tour = NULL;
-    SDL_Surface *bullet = NULL;
-    SDL_Rect posTank, tankSrc ,posMap,tourSrc,posBullet;
+
+  
+
+    tank_t cons(SDL_Surface *tank, int level, int monde){
+    
+      tank_t a = (tank_t) malloc(sizeof(s_tank_t));
+      a->tank = tank ;
+      a->level = 0;
+      a->monde = 1 ;
+      a->pv = 5 ;
+      return a ; 
+  }
+
+  void change_surface(tank_t t, SDL_Surface *new_value){
+    t->tank = new_value ;
+  }
+
+  SDL_Surface* value_surface(tank_t t){
+    return t->tank ;
+  }
+
+
+    tank_t tank ;
+
+    //*tank = NULL,
+	  SDL_Surface *ecran = NULL, *terre = NULL, *mur = NULL, *grass = NULL ,*tank_haut = NULL,*tank_bas = NULL ,*tank_gauche = NULL,*tank_droite = NULL, *tour = NULL;
+    SDL_Surface *bullet = NULL , *flag = NULL;
+
+    SDL_Rect posTank, tankSrc ,posMap,tourSrc,posBullet, posFlag;
     SDL_Event event ;
 
     ecran = SDL_SetVideoMode(WIDTH, HEIGHT, 32, SDL_HWSURFACE | SDL_DOUBLEBUF); 
@@ -30,6 +59,8 @@ void jouer(){
     grass = SDL_LoadBMP("grass.bmp") ;
     tour = SDL_LoadBMP("tourelle.bmp") ;
     bullet = SDL_LoadBMP("bullet.bmp");
+    flag = SDL_LoadBMP("flag.bmp");
+
 
     /*Gestion de la transparence des sprites*/
    
@@ -39,9 +70,13 @@ void jouer(){
     SDL_SetColorKey(tank_haut, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(tank_haut->format, 255,255,255));
     SDL_SetColorKey(tour, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(tour->format, 255,255,255));
     SDL_SetColorKey(bullet, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(bullet->format, 255,255,255));
+    SDL_SetColorKey(flag, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(flag->format, 255,255,255));
+
     
     /*Initialisation fiche sprite tank*/
-    tank = tank_bas; 
+    tank = cons(tank_bas, 1, 1) ;
+    //printf("(con**************************************************************************)\n", );
+    //tank = tank_bas; 
     tankSrc.x = 0;
     tankSrc.y = 0;
     tankSrc.w = SIZE_SPRITE;
@@ -50,7 +85,11 @@ void jouer(){
     tourSrc.x = 0;
     tourSrc.y = 0;
     tourSrc.w = SIZE_SPRITE;
-    tourSrc.h = SIZE_SPRITE;  
+    tourSrc.h = SIZE_SPRITE; 
+
+    posFlag.x = 64;
+    posFlag.y = 32;
+    posFlag = genereFlagPos(tab); 
   
     
     /*Chargement de la map, positionement des sprites mur et terre*/
@@ -80,7 +119,8 @@ void jouer(){
                     case SDLK_UP : 
 
                     if(peutDeplacerTankHaut(tab,posTank)){ 
-                      tank = tank_haut;
+                      change_surface(tank, tank_haut);
+                      //tank = tank_haut;
                       tankSrc.y = 0;
                       if (tankSrc.x >191){
                          tankSrc.x = 0 ;
@@ -95,7 +135,9 @@ void jouer(){
                     case SDLK_DOWN :
 		                 
                     if(peutDeplacerTankBas(tab,posTank)){
-                        tank = tank_bas;
+                        change_surface(tank, tank_bas);
+
+                        //tank = tank_bas;
                         tankSrc.y = 0;
                         if (tankSrc.x >191){  
                             tankSrc.x = 0 ;
@@ -116,7 +158,9 @@ void jouer(){
                       
 
                       if(peutDeplacerTankDroite(tab, posTank)){ 
-                          tank = tank_droite;
+                          change_surface(tank, tank_droite);
+
+                         // tank = tank_droite;
                           tankSrc.x = 0;  
                           
 
@@ -133,8 +177,10 @@ void jouer(){
                     
 		                  case SDLK_LEFT :   
 		               
-                          if(peutDeplacerTankGauche(tab, posTank)){       
-                              tank = tank_gauche;
+                          if(peutDeplacerTankGauche(tab, posTank)){ 
+                              change_surface(tank, tank_gauche);
+      
+                              //tank = tank_gauche;
                               tankSrc.x = 0;
                               if (tankSrc.y >191){  
                                 tankSrc.y = 0 ;
@@ -158,9 +204,14 @@ void jouer(){
 
         afficherMap(tab,posMap,ecran,terre,mur);  
         afficherTour(tabPosTour,ecran,tour);
-        SDL_BlitSurface(tank, &tankSrc, ecran, &posTank) ; 
- 
-        
+        SDL_BlitSurface(value_surface(tank), &tankSrc, ecran, &posTank) ; 
+       if(hasReached(tank, posTank,posFlag)){
+                posFlag = genereFlagPos(tab);
+              }
+              
+              SDL_BlitSurface(flag,NULL,ecran,&posFlag);
+              SDL_BlitSurface(value_surface(tank), &tankSrc, ecran, &posTank) ; 
+              
 
         SDL_Flip(ecran) ; 
     }
