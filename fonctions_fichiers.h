@@ -1,40 +1,44 @@
 #include <SDL/SDL.h>
-#include "jouer.h"
+#include "structure.h"
 
-typedef struct s_tank { 
-    SDL_Surface *tank; 
-    int level;
-    int monde ;
-    int pv ;
-  } s_tank_t, *tank_t ;
-
+/*Fonctions allocations mémoires*/
 char** allouer_tab_2D(int n, int m);
-SDL_Rect* allouer_tab_1D(int n);
-/*void desallouer_tab_2D(char** tab, int n);*/
-void desallouer_tab_2D(char** tab, int dimension1, int dimension2);
+SDL_Rect* allouer_tab_1D_Rect(int n);
+void desallouer_tab_2D(char** tab, int n);
 void afficher_tab_2D(char** tab, int n, int m);
 void taille_fichier(const char* nomFichier, int* nbLig, int* nbCol);
 char** lire_fichier(const char* nomFichier);
-void ecrire_fichier(const char* nomFichier, char* chaine) ;
+Tir* allouer_tab_1D_Tir(int n);
+Tir* genereTabTir(int n);
+
+/*Fonctions d'affichages */
 void afficherMap(char** map, SDL_Rect pos,SDL_Surface *ecran,SDL_Surface *terre,SDL_Surface *mur);
 SDL_Rect* genereTourPos(char** map);
 void afficherTour(SDL_Rect* tabPosTour,SDL_Surface *ecran,SDL_Surface *tour);
-int calculA(SDL_Rect posTour , SDL_Rect posTank);
-int calculB(SDL_Rect posTour, SDL_Rect posTank);
-int calculC(SDL_Rect posTour, SDL_Rect posTank);
+
+/*Fonction calcul la position des balles de tirs*/
+void initialise_Tir(SDL_Rect* tabPosTour,SDL_Rect posTank,Tir* tabTir);
+void calcul_Tir(Tir* tabTir);
+void affiche_Tir(Tir* tabTir,SDL_Surface *bullet,SDL_Surface *ecran);
+void fire_Down(Tir* tabTir);
+
+/*Fonction pour le flag*/
 SDL_Rect genereFlagPos(char** map);
- void print(tank_t t) ;
-int hasReached(tank_t tank, SDL_Rect postank,SDL_Rect posFlag);
-void jouer();
- void next_level(tank_t t) ;
- int est_mort(tank_t t) ;
- int get_pv(tank_t t) ;
-int get_level(tank_t t) ;
-int get_monde(tank_t t) ;
+int hasReached(SDL_Rect tank,SDL_Rect posFlag);
 
 /*Fonctions booléennes pour les collisions*/
-int peutDeplacerTankHaut(char** tab, SDL_Rect posTank);
-int peutDeplacerTankDroite(char** tab, SDL_Rect posTank);
-int peutDeplacerTankBas(char** tab, SDL_Rect posTank);
-int peutDeplacerTankGauche(char** tab, SDL_Rect posTank);
+int peutDeplacerTankHaut(char** tab, SDL_Rect *posTank);
+int peutDeplacerTankDroite(char** tab, SDL_Rect *posTank);
+int peutDeplacerTankBas(char** tab, SDL_Rect *posTank);
+int peutDeplacerTankGauche(char** tab, SDL_Rect *posTank);
+
+/*Foncions pour les calculs de tir*/
+int calculA(SDL_Rect posTour , SDL_Rect posTank);
+int calculB(SDL_Rect posTour, SDL_Rect posTank);
+long calculC(SDL_Rect posTour, SDL_Rect posTank);
+
+/*Fonction JOUER*/
+void jouer();
+
+
 
