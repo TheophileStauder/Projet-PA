@@ -21,6 +21,8 @@ void initialise_Tir(SDL_Rect* tabPosTour,SDL_Rect posTank,Tir* tabTir);
 void calcul_Tir(Tir* tabTir);
 void affiche_Tir(Tir* tabTir,SDL_Surface *bullet,SDL_Surface *ecran);
 void fire_Down(Tir* tabTir);
+int est_Touche(Tir* tabTir,SDL_Rect posTank);
+void affiche_Explosion(SDL_Surface* explosion,SDL_Surface *ecran,SDL_Rect posTank,SDL_Rect exploSrc);
 
 /*Fonction pour le flag*/
 SDL_Rect genereFlagPos(char** map);
@@ -32,13 +34,12 @@ int peutDeplacerTankDroite(char** tab, SDL_Rect *posTank);
 int peutDeplacerTankBas(char** tab, SDL_Rect *posTank);
 int peutDeplacerTankGauche(char** tab, SDL_Rect *posTank);
 
-/*Foncions pour les calculs de tir*/
-int calculA(SDL_Rect posTour , SDL_Rect posTank);
-int calculB(SDL_Rect posTour, SDL_Rect posTank);
-long calculC(SDL_Rect posTour, SDL_Rect posTank);
-
 /*Fonction JOUER*/
 void jouer();
+
+
+/*Fonction calcul angle*/
+float calcul_Angle(SDL_Rect posTour , SDL_Rect posTank);
 
 
 
