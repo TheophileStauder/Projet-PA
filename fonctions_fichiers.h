@@ -25,7 +25,7 @@ int est_Touche(Tir* tabTir,SDL_Rect posTank);
 void affiche_Explosion(SDL_Surface* explosion,SDL_Surface *ecran,SDL_Rect posTank,SDL_Rect exploSrc);
 
 /*Fonction pour le flag*/
-SDL_Rect genereFlagPos(char** map);
+SDL_Rect genereFlagPos(char** map,SDL_Rect posTank);
 int hasReached(SDL_Rect tank,SDL_Rect posFlag);
 
 /*Fonctions booléennes pour les collisions*/
