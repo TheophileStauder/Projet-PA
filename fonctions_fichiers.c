@@ -2,7 +2,9 @@
 #include <time.h>
 #include "define.h"
 #include "fonctions_fichiers.h"
+#include "jouer.h"
 #include <math.h>
+
 
 /*Alloue un tableau de char à 2 dimension*/
 char** allouer_tab_2D(int n, int m){
@@ -34,7 +36,7 @@ void desallouer_tab_2D(char** tab, int n){
 	for(j = 0; j < n ; j++){
 		free(tab[j]);
 	}
-	
+	//free(tab);
 }
 
 
@@ -68,32 +70,42 @@ char** lire_fichier(const char* nomFichier){
 		    c = fgetc(ptrFichier);
 		    if(c=='\n'){
 		      printf("\n");
-
 		      i++; 
 		      j = 0 ;
 		    }
 		   
 		    if(c!=10 && c!=-1){
-			tab[i][j] = c;
-			n++ ;
+			     tab[i][j] = c;
+			     n++ ;
 		    }
 		     if(c!='\n'){
-		      j++ ;
-                    }
+		        j++ ;
+          }   
 		}while(c != EOF);
 
 	}
-	fclose(ptrFichier);  
-	
+	fclose(ptrFichier);  	
 	return tab;
   
 }
 
-
+void ecrire_fichier(const char* nomFichier, char* chaine){
+  FILE* ptrFichier = fopen(nomFichier, "w+");
+  if (ptrFichier==NULL){ 
+      perror("Erroropeningfile");  
+  }
+  else{
+    fputs(chaine, ptrFichier) ;
+    if (ferror(ptrFichier)){
+      printf("Error writting to nomFichier.txt\n");
+    }
+    fclose(ptrFichier) ;
+  }
+}
 
 void afficherMap(char** map, SDL_Rect pos,SDL_Surface *ecran,SDL_Surface *terre,SDL_Surface *mur){
-	int i,j;
-	for(i = 0 ; i < 10 ; i++){
+  int i,j;
+  for(i = 0 ; i < 10 ; i++){
         for (j = 0 ; j < 20 ; j++){
             if(map[i][j] == '1'){
                 SDL_BlitSurface(mur, NULL, ecran, &pos) ;
@@ -111,73 +123,75 @@ void afficherMap(char** map, SDL_Rect pos,SDL_Surface *ecran,SDL_Surface *terre,
 }
 
 
-int peutDeplacerTankHaut(char** tab, SDL_Rect *posTank){
-	int i,j,i2,j2,res;
-	
-	i = ((posTank->y + 30 ) /32);
-	j = ((posTank->x +4) /32) ;
-	i2 = ((posTank->y + 30 ) /32);
-	j2 = ((posTank->x +28) /32) ;
-	
-  res = 1;
-	
-	if(tab[i-1][j]=='1' || tab[i2-1][j2] == '1'){
-		res = 0;
-	}
 
-	return res;
+
+int peutDeplacerTankHaut(char** tab, SDL_Rect *posTank){
+  int i,j,i2,j2,res;
+  
+  i = ((posTank->y + 30 ) /32);
+  j = ((posTank->x +4) /32) ;
+  i2 = ((posTank->y + 30 ) /32);
+  j2 = ((posTank->x +28) /32) ;
+  
+  res = 1;
+  
+  if(tab[i-1][j]=='1' || tab[i2-1][j2] == '1'){
+    res = 0;
+  }
+
+  return res;
 }
 
 int peutDeplacerTankDroite(char** tab, SDL_Rect *posTank){
-	int i,j,i2,j2,res;
+  int i,j,i2,j2,res;
 
-	
-	i = ((posTank->y + 4) / 32)  ;
-	j = (posTank->x /32) ;
-	res = 1;
-	i2 = ((posTank->y + 28)  / 32)  ;
-	j2 = (posTank->x  /32) ;
+  
+  i = ((posTank->y + 4) / 32)  ;
+  j = (posTank->x /32) ;
+  res = 1;
+  i2 = ((posTank->y + 28)  / 32)  ;
+  j2 = (posTank->x  /32) ;
 
-	if(tab[i][j+1] == '1' || tab[i2][j2+1] == '1'){
-		res = 0;
-	}
+  if(tab[i][j+1] == '1' || tab[i2][j2+1] == '1'){
+    res = 0;
+  }
 
-	return res;
+  return res;
 }
 
 int peutDeplacerTankBas(char** tab, SDL_Rect *posTank){
-	int i,j,i2,j2,res;
-	
-	i = (posTank->y + 2) / 32 ;
-	j = ((posTank->x + 4)/ 32) ;
+  int i,j,i2,j2,res;
+  
+  i = (posTank->y + 2) / 32 ;
+  j = ((posTank->x + 4)/ 32) ;
 
-	i2 = (posTank->y + 2) / 32 ;
-	j2 = (posTank->x + 28) / 32;
+  i2 = (posTank->y + 2) / 32 ;
+  j2 = (posTank->x + 28) / 32;
 
-	res = 1;
+  res = 1;
 
-	if(tab[i+1][j]=='1'|| tab[i2+1][j2] == '1'){
-		res = 0;
-	}
+  if(tab[i+1][j]=='1'|| tab[i2+1][j2] == '1'){
+    res = 0;
+  }
 
-	return res;
+  return res;
 }
 
 int peutDeplacerTankGauche(char** tab, SDL_Rect *posTank){
-	int i,j,i2,j2,res;
-	
-	i = (posTank->y + 4 )/ 32;
-	j = (posTank->x + 30) / 32;
-	i2 = (posTank->y + 28)/ 32;
-	j2 = (posTank->x + 30) / 32; 
+  int i,j,i2,j2,res;
+  
+  i = (posTank->y + 4 )/ 32;
+  j = (posTank->x + 30) / 32;
+  i2 = (posTank->y + 28)/ 32;
+  j2 = (posTank->x + 30) / 32; 
 
-	res = 1;
+  res = 1;
 
-	if(tab[i][j-1] == '1' || tab[i2][j2-1] == '1'){
-		res = 0;
-	}
+  if(tab[i][j-1] == '1' || tab[i2][j2-1] == '1'){
+    res = 0;
+  }
 
-	return res;
+  return res;
 }
 
 
@@ -186,45 +200,6 @@ float calcul_Angle(SDL_Rect posTour , SDL_Rect posTank){
   int dir_y= (posTank.y-posTour.y);
   float res = atan2(dir_x,dir_y);
   return res;
-}
-
-SDL_Rect* genereTourPos(char** map){
-  
-  int i1 = 0,j1 = 0;
-  int i = 0,j = 0;
-  int peutPasPoserTour;
-  SDL_Rect* tabPosTour = allouer_tab_1D_Rect(NB_TOUR);
-  srand(time(NULL));
-  for(i1=0;i1<10;i1++){
-    peutPasPoserTour = 1;
-    while(peutPasPoserTour){
-      if(map[i][j] == '1' && (i!= 0 && j !=0)){
-        tabPosTour[j1].x = j*SIZE_SPRITE;
-        tabPosTour[i1].y = i*SIZE_SPRITE;
-        printf("Map[%d][%d] = %c",i,j,map[i][j]);
-        peutPasPoserTour = 0;
-        j1++;
-      }
-      i = rand()%9+0;
-      j = rand()%19+0;
-      
-    }
-  }
-
-  return tabPosTour;
-}
-
-Tir* genereTabTir(int n){
-  Tir* tabTir = allouer_tab_1D_Tir(n);
-  return tabTir;
-}
-
-
-void afficherTour(SDL_Rect* tabPosTour,SDL_Surface *ecran,SDL_Surface *tour){
-  int i;
-  for(i=0;i<NB_TOUR;i++){
-    SDL_BlitSurface(tour,NULL,ecran,&tabPosTour[i]);
-  }
 }
 
 SDL_Rect genereFlagPos(char** map,SDL_Rect posTank){
@@ -252,7 +227,22 @@ SDL_Rect genereFlagPos(char** map,SDL_Rect posTank){
   return posFlag;
 }
 
-int hasReached(SDL_Rect posTank,SDL_Rect posFlag){
+
+Tir* genereTabTir(int n){
+  Tir* tabTir = allouer_tab_1D_Tir(n);
+  return tabTir;
+}
+
+void afficherTour(SDL_Rect* tabPosTour,SDL_Surface *ecran,SDL_Surface *tour){
+  int i;
+  for(i=0;i<NB_TOUR;i++){
+    SDL_BlitSurface(tour,NULL,ecran,&tabPosTour[i]);
+  }
+}
+
+
+
+int hasReached(tank_t tank, SDL_Rect posTank,SDL_Rect posFlag){
     
     int iTank,jTank,iFlag,jFlag;
     int boolean = 0;
@@ -263,15 +253,18 @@ int hasReached(SDL_Rect posTank,SDL_Rect posFlag){
 
     if(iTank == iFlag && jTank == jFlag){
       boolean = 1;
+      next_level(tank) ;
     }
     return boolean;
 }
+
 void fire_Down(Tir* tabTir){
   int i;
   for(i=0;i<NB_TOUR;i++){
     tabTir[i].fire = 0;
   }
 }
+
 void initialise_Tir(SDL_Rect* tabPosTour,SDL_Rect posTank,Tir* tabTir){
     srand(time(NULL));
 
@@ -303,7 +296,9 @@ void afficher_Tir(Tir* tabTir,SDL_Surface *bullet,SDL_Surface *ecran){
       tabTir[i].posBullet.x = tabTir[i].pos_x;
       tabTir[i].posBullet.y = tabTir[i].pos_y;
       SDL_BlitSurface(bullet,NULL,ecran,&tabTir[i].posBullet);
-      if(tabTir[i].pos_x < 0 || tabTir[i].pos_x > 640 || tabTir[i].pos_y < 0 || tabTir[i].pos_y > 320){tabTir[i].fire = 0;}
+      if(tabTir[i].pos_x < 0 || tabTir[i].pos_x > 640 || tabTir[i].pos_y < 0 || tabTir[i].pos_y > 320){
+        tabTir[i].fire = 0;
+      }
     }
   }
 }
@@ -317,6 +312,32 @@ int est_Touche(Tir* tabTir,SDL_Rect posTank){
   return res;
 }
 
+SDL_Rect* genereTourPos(char** map){
+  
+  int i1 = 0,j1 = 0;
+  int i = 0,j = 0;
+  int peutPasPoserTour;
+  SDL_Rect* tabPosTour = allouer_tab_1D_Rect(NB_TOUR);
+  srand(time(NULL));
+  for(i1=0;i1<10;i1++){
+    peutPasPoserTour = 1;
+    while(peutPasPoserTour){
+      if(map[i][j] == '1' && (i!= 0 && j !=0)){
+        tabPosTour[j1].x = j*SIZE_SPRITE;
+        tabPosTour[i1].y = i*SIZE_SPRITE;
+        printf("Map[%d][%d] = %c",i,j,map[i][j]);
+        peutPasPoserTour = 0;
+        j1++;
+      }
+      i = rand()%9+0;
+      j = rand()%19+0;
+      
+    }
+  }
+
+  return tabPosTour;
+}
+
 void affiche_Explosion(SDL_Surface* explosion,SDL_Surface *ecran,SDL_Rect posTank,SDL_Rect exploSrc){
   exploSrc.x = 0;
   SDL_BlitSurface(explosion,&exploSrc,ecran,&posTank);
@@ -327,7 +348,9 @@ void affiche_Explosion(SDL_Surface* explosion,SDL_Surface *ecran,SDL_Rect posTan
 }
 
 
-void HandleEvent(SDL_Event event, char ** map,int *continuer, SDL_Rect *posTank,SDL_Rect *tankSrc, SDL_Surface *tank,SDL_Surface *tank_haut,SDL_Surface *tank_droite,SDL_Surface *tank_gauche,SDL_Surface *tank_bas){
+
+
+  void HandleEvent(SDL_Event event, char ** map,int *continuer, SDL_Rect *posTank,SDL_Rect *tankSrc, SDL_Surface *tank,SDL_Surface *tank_haut,SDL_Surface *tank_droite,SDL_Surface *tank_gauche,SDL_Surface *tank_bas){
   switch(event.type){
             case SDL_QUIT :
                 *continuer = 0 ;
@@ -357,18 +380,21 @@ void HandleEvent(SDL_Event event, char ** map,int *continuer, SDL_Rect *posTank,
                           
                           *tank = *tank_bas;
                           tankSrc->y = 0;  
+
                           if (tankSrc->x >191){
                            tankSrc->x = 0 ;
                           }
                           tankSrc->x += SIZE_SPRITE; 
                           posTank->y += 2;  
-                          printf("SrcX = %d\n",tankSrc->x  );            
-                          printf("SrcY = %d\n",tankSrc->y  );             
+                          /*printf("SrcX = %d\n",tankSrc->x  );            
+                          printf("SrcY = %d\n",tankSrc->y  );          */   
                       }
 
+
                         break ;
-                    
                     case SDLK_RIGHT :  
+                    
+
                       if(peutDeplacerTankDroite(map, posTank)){ 
                           
                           *tank = *tank_droite;
@@ -409,144 +435,55 @@ void HandleEvent(SDL_Event event, char ** map,int *continuer, SDL_Rect *posTank,
 }
 
 
+ void next_level(tank_t t){
+    t->level ++ ;
 
-void jouer(){
-  
-    char** map = lire_fichier("ecrire") ;
-    int continuer = 1;
-    int nbLife = 800;
+ }
 
-    SDL_Surface *ecran = NULL, *terre = NULL, *mur = NULL, *tank = NULL,*tank_haut = NULL,*tank_bas = NULL ,*tank_gauche = NULL,*tank_droite = NULL, *tour = NULL;
-    SDL_Surface *bullet = NULL , *flag = NULL,*explosion = NULL,*life = NULL,*initialise_Pos_Tank = NULL;
-    SDL_Rect posTank, tankSrc,posMap,posFlag,exploSrc,lifeSrc,posLife;
-    SDL_Rect* tabPosTour = genereTourPos(map);
-    Tir* tabTir = genereTabTir(NB_TOUR);
-    SDL_Event event ;
-
-    ecran = SDL_SetVideoMode(WIDTH, HEIGHT, 32, SDL_HWSURFACE | SDL_DOUBLEBUF); 
-    SDL_FillRect(ecran, NULL, SDL_MapRGB(ecran->format, 255, 255, 255)) ;
-
-    /*Chargement des sprites*/
-    terre = SDL_LoadBMP("terreBon.bmp") ;
-    mur = SDL_LoadBMP("murBon.bmp") ;
-    tank_haut = SDL_LoadBMP("tank_haut.bmp") ;
-    tank_bas = SDL_LoadBMP("tank_bas.bmp") ;
-    initialise_Pos_Tank = SDL_LoadBMP("tank_bas.bmp") ;
-    tank_droite = SDL_LoadBMP("tank_droite.bmp") ;
-    tank_gauche = SDL_LoadBMP("tank_gauche.bmp") ;
-    tour = SDL_LoadBMP("tourelle.bmp") ;
-    bullet = SDL_LoadBMP("bullet.bmp");
-    flag = SDL_LoadBMP("flag.bmp");
-    explosion = SDL_LoadBMP("explosion.bmp");
-    life = SDL_LoadBMP("life.bmp");
-
-    /*Gestion de la transparence des sprites*/
-    SDL_SetColorKey(tank_droite, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(tank_droite->format, 255,255,255));
-    SDL_SetColorKey(tank_gauche, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(tank_gauche->format, 255,255,255));
-    SDL_SetColorKey(tank_bas, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(tank_bas->format, 255,255,255));
-    SDL_SetColorKey(initialise_Pos_Tank, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(initialise_Pos_Tank->format, 255,255,255));
-    SDL_SetColorKey(tank_haut, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(tank_haut->format, 255,255,255));
-    SDL_SetColorKey(tour, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(tour->format, 255,255,255));
-    SDL_SetColorKey(bullet, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(bullet->format, 255,255,255));
-    SDL_SetColorKey(flag, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(flag->format, 255,255,255));
-    SDL_SetColorKey(explosion, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(explosion->format, 255,255,255));
-    SDL_SetColorKey(life, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(life->format, 106,116,126));
+ void print(tank_t t){
+    printf("\nlevel = %d \nmonde = %d\n ", t->level, t->monde);
+  }
 
 
-    /*Initialisation fiche sprite tank*/
-    tank = initialise_Pos_Tank; 
-    tankSrc.x = 0;
-    tankSrc.y = 0;
-    tankSrc.w = SIZE_SPRITE;
-    tankSrc.h = SIZE_SPRITE;  
 
-    exploSrc.x = 0;
-    exploSrc.y = 0;
-    exploSrc.w = SIZE_SPRITE;
-    exploSrc.h = SIZE_SPRITE; 
-
-    lifeSrc.x = 0;
-    lifeSrc.y = 0;
-    lifeSrc.w = SIZE_SPRITE;
-    lifeSrc.h = SIZE_SPRITE; 
-  
-    
-    /*Chargement de la map, positionement des sprites mur et terre*/
-    afficherMap(map,posMap,ecran,terre,mur);
-
-    posTank.x = 64 + (12*32);
-    posTank.y = 64;
-
-    posMap.x = 0;
-    posMap.y = 0;
-
-    posFlag.x = 64;
-    posFlag.y = 32;
-    posFlag = genereFlagPos(map,posTank);
-
-    posLife.x = 8;
-    posLife.y = 6;
-
-    fire_Down(tabTir);
-
-    /* Boucle infini pour jouer tant qu'on a pas perdu ou arreter le programme*/
-    while(continuer){
-        
-        //printf("Nombre de vie restante = %d\n",nbLife );
-
-        /*Si evenement appel de la fonciton HandleEvent*/
-        if(SDL_PollEvent(&event)){
-          HandleEvent(event,map,&continuer,&posTank,&tankSrc,tank,tank_haut,tank_droite,tank_gauche,tank_bas);
-        }
-        
-        /*Affichage carte et tourelle*/
-        afficherMap(map,posMap,ecran,terre,mur);  
-        afficherTour(tabPosTour,ecran,tour);
-        
-        /*Initialisation, calcul et affichage des tirs*/
-        initialise_Tir(tabPosTour,posTank,tabTir);
-        calcul_Tir(tabTir);
-        afficher_Tir(tabTir,bullet,ecran);
-
-        /*Verification si joueur a récupéré le drapeau*/
-        if(hasReached(posTank,posFlag)){
-          posFlag = genereFlagPos(map,posTank);
-        }
-        
-        /*Affichage*/
-        SDL_BlitSurface(flag,NULL,ecran,&posFlag);
-        SDL_BlitSurface(tank, &tankSrc, ecran, &posTank) ; 
-        SDL_BlitSurface(life,&lifeSrc,ecran,&posLife);
-        
-        /*Si joueur touche, decrementation de nbLife et affichage explosion*/
-        if(est_Touche(tabTir,posTank)){
-          printf("TOUCHE\n");
-          affiche_Explosion(explosion,ecran,posTank,exploSrc);
-          nbLife--;
-          if(nbLife > 0 ){
-            if(nbLife %200 == 0){
-            lifeSrc.x += SIZE_SPRITE*2;
-            }
-          }
-          else{continuer = 0;}
-        }
-         SDL_Flip(ecran) ; 
-      }
-
-    /*Free de tous les tabeaux*/
-    desallouer_tab_2D(map,10);  
-    free(tabTir);
-
-    /*Free de toutes les SDL_Surfaces*/
-    //SDL_FreeSurface(tank_droite) ; 
-    //SDL_FreeSurface(tank_gauche) ;
-    //SDL_FreeSurface(tank_haut) ;
-    //SDL_FreeSurface(tank_bas) ;
-    //SDL_FreeSurface(tank);
-    SDL_FreeSurface(life);
-    SDL_FreeSurface(flag);
-    SDL_FreeSurface(tour);
-    SDL_FreeSurface(mur) ;
-    SDL_FreeSurface(terre) ;
-    SDL_FreeSurface(bullet);
+int get_level(tank_t t){
+  return t->level ;
 }
+
+int get_monde(tank_t t){
+  return t->monde ;
+}
+// augmente la variable monde si 9 flags ramassé et remet flag a 0
+void update_monde(tank_t t){
+  if(t->level == 9){
+    t->monde++ ;
+    t->level = 0 ;
+  }
+}
+
+/* ecrit le score dans ecriture_fichier ma fait une erreur de seg*/
+void est_mort(tank_t t){
+  char monde[2] ;
+  char level[2] ;
+  sprintf(monde, "%d", t->monde) ;
+  sprintf(level, "%d", t->level) ;
+  printf("je suis dans estmort\n");
+  printf("char monde = %s et char level = %s\n", monde, level);
+  char res[4] ;
+  res[0] = level[0] ;
+  res[1] = monde[0] ;
+  printf("et res = %s\n",res );
+  ecrire_fichier("ecriture_fichier",res) ;
+
+ }
+
+
+
+tank_t cons(){
+      
+        tank_t a = (tank_t) malloc(sizeof(s_tank_t));
+        a->level = 0;
+        a->monde = 1 ;
+        return a ; 
+    }
+
