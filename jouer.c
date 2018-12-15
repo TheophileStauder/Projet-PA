@@ -3,6 +3,8 @@
 //#include "fonctions_fichiers.h"
 #include "jouer.h"
 #include "define.h"
+#include <SDL/SDL_mixer.h>
+
 
 
 
@@ -13,6 +15,27 @@ void jouer(){
     int nbLife = 800;
     tank_t tank2 ;
     tank2 = cons() ;
+
+    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1) //Initialisation de l'API Mixer
+       {
+          printf("%s", Mix_GetError());
+       }
+    printf("je suis dans jouer") ;
+    // pour la musique de fond
+    Mix_Music *musique; //Création du pointeur de type Mix_Music
+    musique = Mix_LoadMUS("musique.mp3"); //Chargement de la musique
+    Mix_PlayMusic(musique, -1); //Jouer infiniment la musique
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 5);  // volume de la musique
+
+    // pour le bruit d'explosion
+    Mix_AllocateChannels(32); //Allouer 32 canaux
+    Mix_Volume(1, MIX_MAX_VOLUME/5); //Mettre à mi-volume le post 1
+    Mix_Chunk *son;//Créer un pointeur pour stocker un .WAV
+    Mix_Chunk *son2 ;
+    son = Mix_LoadWAV("son.wav"); //Charger un wav dans un pointeur
+    son2 = Mix_LoadWAV("Ta Da-SoundBible.com-1884170640.wav") ;
+    Mix_VolumeChunk(son, MIX_MAX_VOLUME/2); //Mettre un volume pour ce wav
+    Mix_VolumeChunk(son2, MIX_MAX_VOLUME/10); //Mettre un volume pour ce wav
 
 
 
@@ -90,6 +113,8 @@ void jouer(){
     posLife.y = 6;
 
     fire_Down(tabTir);
+        int tmp_prec = 0 ;
+        int tmp_now = 0 ;
 
     /* Boucle infini pour jouer tant qu'on a pas perdu ou arreter le programme*/
     while(continuer){
@@ -111,6 +136,7 @@ void jouer(){
         /*Verification si joueur a récupéré le drapeau*/
         if(hasReached(tank2, posTank,posFlag)){
           posFlag = genereFlagPos(map, posTank);
+          Mix_PlayChannel(2, son2, 0) ;
         }
         
         update_monde(tank2) ;
@@ -120,11 +146,16 @@ void jouer(){
         SDL_BlitSurface(flag,NULL,ecran,&posFlag);
         SDL_BlitSurface(tank, &tankSrc, ecran, &posTank) ; 
         SDL_BlitSurface(life,&lifeSrc,ecran,&posLife);
-
+        int prochain_son = SDL_GetTicks() + 1000 ;
         /*Si joueur touche, decrementation de nbLife et affichage explosion*/
         if(est_Touche(tabTir,posTank)){
           affiche_Explosion(explosion,ecran,posTank,exploSrc);
           nbLife--;
+          tmp_now = SDL_GetTicks() ;
+          if(tmp_now - tmp_prec > 1000){
+            Mix_PlayChannel(1, son, 0);//Joue le son 1 sur le canal 1 ; le joue une fois (0 + 1)
+            tmp_prec = tmp_now ;
+          }
           if(nbLife>0 ){
             if (nbLife%200 == 0){
               lifeSrc.x += SIZE_SPRITE*2;
@@ -146,6 +177,11 @@ void jouer(){
     /*Free de tous les tabeaux*/
     desallouer_tab_2D(map,10);  
     free(tabTir);
+    Mix_FreeChunk(son);//Libération du son 1
+    Mix_FreeChunk(son2) ;
+
+    Mix_FreeMusic(musique); //Libération de la musique
+    Mix_CloseAudio(); //Fermeture de l'API
 
     /*Free de toutes les SDL_Surfaces*/
     //SDL_FreeSurface(tank_droite) ; 

@@ -137,6 +137,7 @@ int main(int argc, char *argv[])
               SDL_GetMouseState(&x, &y);   
               // si clique sur le bouton jouer
               if(y>=32 && y <= 72 && x>=213 && x<=454 && !dans_option) {     
+
                 jouer(); 
                 dans_option = 0 ;
                 afficher = 1 ;
@@ -187,8 +188,6 @@ int main(int argc, char *argv[])
     SDL_FreeSurface(texte);
     SDL_FreeSurface(retour);
     SDL_FreeSurface(monde);
-
-
 
     SDL_Quit(); // Arrêt de la SDL
     TTF_CloseFont(police); /* Doit être avant TTF_Quit() */
