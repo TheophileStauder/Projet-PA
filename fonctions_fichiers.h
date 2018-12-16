@@ -33,7 +33,7 @@ SDL_Rect genereFlagPos(char** map,SDL_Rect posTank) ;
 //SDL_Rect genereFlagPos(char** map);
 int hasReached(tank_t tank, SDL_Rect postank,SDL_Rect posFlag);
 void fire_Down(Tir* tabTir) ;
-void initialise_Tir(SDL_Rect* tabPosTour,SDL_Rect posTank,Tir* tabTir) ;
+void initialise_Tir(SDL_Rect* tabPosTour,SDL_Rect posTank,Tir* tabTir,float vitesse) ;
 void calcul_Tir(Tir* tabTir) ;
 void afficher_Tir(Tir* tabTir,SDL_Surface *bullet,SDL_Surface *ecran) ;
 int est_Touche(Tir* tabTir,SDL_Rect posTank) ;

@@ -1,6 +1,5 @@
 #include <SDL/SDL.h>
 #include "fonctions_fichiers.c"
-//#include "fonctions_fichiers.h"
 #include "jouer.h"
 #include "define.h"
 #include <SDL/SDL_mixer.h>
@@ -15,11 +14,13 @@ void jouer(){
     int nbLife = 800;
     tank_t tank2 ;
     tank2 = cons() ;
+    float vitesse = VELOCITY;
 
     if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1) //Initialisation de l'API Mixer
-       {
-          printf("%s", Mix_GetError());
-       }
+    {
+        printf("%s", Mix_GetError());
+    }
+
     printf("je suis dans jouer") ;
     // pour la musique de fond
     Mix_Music *musique; //Création du pointeur de type Mix_Music
@@ -38,14 +39,15 @@ void jouer(){
     Mix_VolumeChunk(son2, MIX_MAX_VOLUME/10); //Mettre un volume pour ce wav
 
 
-
     SDL_Surface *ecran = NULL, *terre = NULL, *mur = NULL, *tank = NULL,*tank_haut = NULL,*tank_bas = NULL ,*tank_gauche = NULL,*tank_droite = NULL, *tour = NULL;
-    SDL_Surface *bullet = NULL , *flag = NULL,*explosion = NULL,*life = NULL, *initialise_Pos_Tank = NULL;
-    
+    SDL_Surface *bullet = NULL , *flag = NULL,*explosion = NULL,*life = NULL, *initialise_Pos_Tank = NULL,*mur_bleu = NULL,*terre_bleue = NULL,*mur_sapin =NULL;
+    SDL_Surface *terre_blanche = NULL,*mur_noir = NULL,*win = NULL;
+
     SDL_Rect posTank, tankSrc,posMap,posFlag,exploSrc,lifeSrc,posLife;
     
     SDL_Rect* tabPosTour = genereTourPos(map);
     Tir* tabTir = genereTabTir(NB_TOUR);
+    
     SDL_Event event ;
 
     ecran = SDL_SetVideoMode(WIDTH, HEIGHT, 32, SDL_HWSURFACE | SDL_DOUBLEBUF); 
@@ -64,6 +66,12 @@ void jouer(){
     flag = SDL_LoadBMP("flag.bmp");
     explosion = SDL_LoadBMP("explosion.bmp");
     life = SDL_LoadBMP("life.bmp");
+    mur_bleu = SDL_LoadBMP("mur_bleu.bmp");
+    terre_bleue = SDL_LoadBMP("terre_bleue.bmp");
+    mur_sapin = SDL_LoadBMP("mur_sapin.bmp");
+    terre_blanche = SDL_LoadBMP("terre_blanche.bmp");
+    mur_noir = SDL_LoadBMP("mur_noir.bmp");
+    win = SDL_LoadBMP("you_win.bmp");
 
     /*Gestion de la transparence des sprites*/
     SDL_SetColorKey(tank_droite, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(tank_droite->format, 255,255,255));
@@ -113,8 +121,8 @@ void jouer(){
     posLife.y = 6;
 
     fire_Down(tabTir);
-        int tmp_prec = 0 ;
-        int tmp_now = 0 ;
+    int tmp_prec = 0 ;
+    int tmp_now = 0 ;
 
     /* Boucle infini pour jouer tant qu'on a pas perdu ou arreter le programme*/
     while(continuer){
@@ -125,13 +133,17 @@ void jouer(){
         }
         
         /*Affichage carte et tourelle*/
-        afficherMap(map,posMap,ecran,terre,mur);  
+        if(get_monde(tank2) == 1){afficherMap(map,posMap,ecran,terre,mur);}
+        if(get_monde(tank2)  == 2){afficherMap(map,posMap,ecran,terre_bleue,mur_bleu);} 
+        if(get_monde(tank2)  == 3){afficherMap(map,posMap,ecran,terre_blanche,mur_noir);} 
+        if(get_monde(tank2)  == 4){afficherMap(map,posMap,ecran,terre_blanche,mur_sapin);} 
         afficherTour(tabPosTour,ecran,tour);
         
         /*Initialisation, calcul et affichage des tirs*/
-        initialise_Tir(tabPosTour,posTank,tabTir);
+        initialise_Tir(tabPosTour,posTank,tabTir,vitesse);
         calcul_Tir(tabTir);
         afficher_Tir(tabTir,bullet,ecran);
+
 
         /*Verification si joueur a récupéré le drapeau*/
         if(hasReached(tank2, posTank,posFlag)){
@@ -139,14 +151,39 @@ void jouer(){
           Mix_PlayChannel(2, son2, 0) ;
         }
         
-        update_monde(tank2) ;
-        //print(tank2) ;
+        /*Vérifie si on a assez de drapeau pour changer de monde*/
+        if(get_level(tank2)==9){
+            update_monde(tank2);
+            if(tank2->monde == 2){map = lire_fichier("monde2");}
+            if(tank2->monde == 3){map = lire_fichier("monde3");}
+            if(tank2->monde == 4){map = lire_fichier("monde4");}
+
+            /*Quand on change de monde,on recalcule la position des tours selon la nouvelle carte, on repositionne le tank(pour eiter qui soit dans un mur), on arrête tous les tirs en cours*/
+            tabPosTour = genereTourPos(map);
+            posTank.x = 8*SIZE_SPRITE;
+            posTank.y = SIZE_SPRITE;
+            fire_Down(tabTir);
+            /*On repositionne le drapeau sur la nouvelle map et on réinitialise les vies du joueurs*/
+            posFlag = genereFlagPos(map, posTank);
+            nbLife = 800;
+            vitesse += 0.11;
+            lifeSrc.x = 0;
+
+            if(tank2->monde == 5){
+                SDL_BlitSurface(win,NULL,ecran,&posMap);
+                /*METRRE UN DELAY pour laisser afficher le "you_win*/
+                continuer = 0 ;
+
+            }
+        }
+
 
         /*Affichage*/
         SDL_BlitSurface(flag,NULL,ecran,&posFlag);
         SDL_BlitSurface(tank, &tankSrc, ecran, &posTank) ; 
         SDL_BlitSurface(life,&lifeSrc,ecran,&posLife);
         int prochain_son = SDL_GetTicks() + 1000 ;
+        
         /*Si joueur touche, decrementation de nbLife et affichage explosion*/
         if(est_Touche(tabTir,posTank)){
           affiche_Explosion(explosion,ecran,posTank,exploSrc);
@@ -162,14 +199,11 @@ void jouer(){
             }
           }
           else{
-            est_mort(tank2) ; // ne marche pas
+            est_mort(tank2) ; 
             continuer = 0;
-            //print(tank2) ;
+            
           }
         }
-       /* if (est_mort(tank2)){
-          continuer = 0 ;
-        }*/
   
         SDL_Flip(ecran) ; 
     }
@@ -195,4 +229,11 @@ void jouer(){
     SDL_FreeSurface(mur) ;
     SDL_FreeSurface(terre) ;
     SDL_FreeSurface(bullet);
+    SDL_FreeSurface(mur_bleu);
+    SDL_FreeSurface(terre_bleue);
+    SDL_FreeSurface(terre_blanche);
+    SDL_FreeSurface(mur_sapin);
+    SDL_FreeSurface(mur_noir);
+
+
 }

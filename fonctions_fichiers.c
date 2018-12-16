@@ -63,7 +63,7 @@ char** lire_fichier(const char* nomFichier){
 	FILE* ptrFichier = fopen(nomFichier, "r");
 	
 	if (ptrFichier==NULL)  
-		perror("Erroropeningfile");  
+		perror("Error opening file");  
 	else{
 
 		do{
@@ -265,7 +265,7 @@ void fire_Down(Tir* tabTir){
   }
 }
 
-void initialise_Tir(SDL_Rect* tabPosTour,SDL_Rect posTank,Tir* tabTir){
+void initialise_Tir(SDL_Rect* tabPosTour,SDL_Rect posTank,Tir* tabTir,float vitesse){
     srand(time(NULL));
 
     int num_tour = (rand()%(NB_TOUR));
@@ -274,8 +274,9 @@ void initialise_Tir(SDL_Rect* tabPosTour,SDL_Rect posTank,Tir* tabTir){
       tabTir[num_tour].pos_x = tabPosTour[num_tour].x ;
       tabTir[num_tour].pos_y = tabPosTour[num_tour].y ;
       float angle = calcul_Angle(tabPosTour[num_tour],posTank);
-      tabTir[num_tour].dir_x = sin(angle)*VELOCITY;
-      tabTir[num_tour].dir_y = cos(angle)*VELOCITY;
+      tabTir[num_tour].dir_x = sin(angle)*vitesse;
+      tabTir[num_tour].dir_y = cos(angle)*vitesse;
+      printf("initialise_Tir\n");
     }
 }
 
@@ -307,7 +308,7 @@ int est_Touche(Tir* tabTir,SDL_Rect posTank){
   int i;
   int res = 0;
   for(i=0;i<NB_TOUR;i++){
-    if((tabTir[i].posBullet.x >= posTank.x && (tabTir[i].posBullet.x <= (posTank.x + SIZE_SPRITE))) && ((tabTir[i].posBullet.y >= posTank.y-5) && (tabTir[i].posBullet.y <= (posTank.y +SIZE_SPRITE)))){res = 1;}
+    if((tabTir[i].posBullet.x >= posTank.x && (tabTir[i].posBullet.x <= (posTank.x + SIZE_SPRITE))) && ((tabTir[i].posBullet.y >= posTank.y-5) && (tabTir[i].posBullet.y <= (posTank.y +SIZE_SPRITE )))){res = 1;}
   }
   return res;
 }
@@ -386,8 +387,7 @@ void affiche_Explosion(SDL_Surface* explosion,SDL_Surface *ecran,SDL_Rect posTan
                           }
                           tankSrc->x += SIZE_SPRITE; 
                           posTank->y += 2;  
-                          /*printf("SrcX = %d\n",tankSrc->x  );            
-                          printf("SrcY = %d\n",tankSrc->y  );          */   
+                       
                       }
 
 
@@ -453,12 +453,14 @@ int get_level(tank_t t){
 int get_monde(tank_t t){
   return t->monde ;
 }
-// augmente la variable monde si 9 flags ramassé et remet flag a 0
+
+
 void update_monde(tank_t t){
-  if(t->level == 9){
-    t->monde++ ;
+    t->monde ++ ;
     t->level = 0 ;
-  }
+  
+  printf("MONDE : %d\n",t->monde );
+  printf("LEVEL: %d\n",t->level );
 }
 
 /* ecrit le score dans ecriture_fichier ma fait une erreur de seg*/

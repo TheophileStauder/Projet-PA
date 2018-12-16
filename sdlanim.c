@@ -41,7 +41,6 @@ int main(int argc, char *argv[])
     SDL_Event event1 ; 
     int menuBoolean = 1;  //pour savoir quand quitter
     int afficher = 1 ; //pour ne pas afficher le menu a l'interrieur d'option
-
     //position du fond
     posMenu.x = 0; 
     posMenu.y = 0;   
@@ -132,6 +131,7 @@ int main(int argc, char *argv[])
     while(menuBoolean){
         SDL_WaitEvent(&event1); 
         switch(event1.type){    
+            
             case SDL_MOUSEBUTTONDOWN : 
               // recupere les coordonnees de la souris 
               SDL_GetMouseState(&x, &y);   
@@ -165,6 +165,7 @@ int main(int argc, char *argv[])
                 dans_option = 0 ;
               }
               break;
+            
             case SDL_QUIT:
               menuBoolean = 0;     
               break;
