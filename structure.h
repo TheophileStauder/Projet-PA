@@ -16,8 +16,6 @@ struct Tir{
 };
 
 typedef struct s_tank { 
-    //SDL_Surface *tank; 
     int level;
     int monde ;
-    //int pv ;
   } s_tank_t, *tank_t ;

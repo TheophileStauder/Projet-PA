@@ -53,7 +53,7 @@ void afficher_tab_2D(char** tab, int n, int m){
 }
 
 
-char** lire_fichier(const char* nomFichier){
+char** lire_fichier(const char* nomFichier, int* continuer){
 	
 	int c , n = 0;
 	char** tab = allouer_tab_2D(13,6);
@@ -68,6 +68,9 @@ char** lire_fichier(const char* nomFichier){
 
 		do{
 		    c = fgetc(ptrFichier);
+        if (c!= 48 && c!=49 && c!=10 && c != -1){
+          *continuer = 0 ;
+        }
 		    if(c=='\n'){
 		      printf("\n");
 		      i++; 
@@ -276,7 +279,6 @@ void initialise_Tir(SDL_Rect* tabPosTour,SDL_Rect posTank,Tir* tabTir,float vite
       float angle = calcul_Angle(tabPosTour[num_tour],posTank);
       tabTir[num_tour].dir_x = sin(angle)*vitesse;
       tabTir[num_tour].dir_y = cos(angle)*vitesse;
-      printf("initialise_Tir\n");
     }
 }
 
@@ -326,7 +328,6 @@ SDL_Rect* genereTourPos(char** map){
       if(map[i][j] == '1' && (i!= 0 && j !=0)){
         tabPosTour[j1].x = j*SIZE_SPRITE;
         tabPosTour[i1].y = i*SIZE_SPRITE;
-        printf("Map[%d][%d] = %c",i,j,map[i][j]);
         peutPasPoserTour = 0;
         j1++;
       }
@@ -458,23 +459,16 @@ int get_monde(tank_t t){
 void update_monde(tank_t t){
     t->monde ++ ;
     t->level = 0 ;
-  
-  printf("MONDE : %d\n",t->monde );
-  printf("LEVEL: %d\n",t->level );
 }
 
-/* ecrit le score dans ecriture_fichier ma fait une erreur de seg*/
 void est_mort(tank_t t){
   char monde[2] ;
   char level[2] ;
   sprintf(monde, "%d", t->monde) ;
   sprintf(level, "%d", t->level) ;
-  printf("je suis dans estmort\n");
-  printf("char monde = %s et char level = %s\n", monde, level);
   char res[4] ;
   res[0] = level[0] ;
   res[1] = monde[0] ;
-  printf("et res = %s\n",res );
   ecrire_fichier("ecriture_fichier",res) ;
 
  }

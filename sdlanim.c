@@ -1,7 +1,6 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_ttf.h>
-/*#include "fonctions_fichiers.h"
-#include "fonctions_fichiers.c"*/
+
 #include "jouer.c"
 #include "jouer.h"
 
@@ -17,8 +16,9 @@
 int main(int argc, char *argv[])   
 
 {
+    int p = 1 ; // ne sert a rien (juste pour mettre en parametre de lire_fichier)
     // Recupere le score de la derniere partie   
-    char** tab = lire_fichier("ecriture_fichier") ;
+    char** tab = lire_fichier("ecriture_fichier", &p) ;
 
     // texte qui sera ecrit dans option
     char chaine1[30] = "Nombre de drapeaux : " ; 
