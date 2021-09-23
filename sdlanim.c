@@ -6,44 +6,44 @@
 
 #include "define.h"
 #include <stdio.h>
-#include <stdlib.h> 
-#include <stdbool.h>   
+#include <stdlib.h>
+#include <stdbool.h>
 #include <math.h>
 #include <string.h>
 
 
 
-int main(int argc, char *argv[])   
+int main(int argc, char *argv[])
 
 {
     int p = 1 ; // ne sert a rien (juste pour mettre en parametre de lire_fichier)
-    // Recupere le score de la derniere partie   
-    char** tab = lire_fichier("ecriture_fichier", &p) ;
+    // Recupere le score de la derniere partie
+    char** tab = lire_fichier("log", &p) ;
 
     // texte qui sera ecrit dans option
-    char chaine1[30] = "Nombre de drapeaux : " ; 
+    char chaine1[30] = "Nombre de drapeaux : " ;
     char chaine2[30] = "Monde atteint : " ;
 
     // dernier score repuperé
 
     const char* tab0 = tab[0][0];
     const char* tab1 = tab[0][1];
-   
+
     // concatenation du texte avec le score associé
     strcat(chaine1, &tab0);
     strcat(chaine2, &tab1);
-   
-    /*Declaration des variables surfaces*/ 
-    SDL_Surface *ecran = NULL, *menu = NULL, *barre_jouer = NULL, *barre_options = NULL, *barre_quitter = NULL, *texte = NULL, *retour = NULL, *monde = NULL ;     
+
+    /*Declaration des variables surfaces*/
+    SDL_Surface *ecran = NULL, *menu = NULL, *barre_jouer = NULL, *barre_options = NULL, *barre_quitter = NULL, *texte = NULL, *retour = NULL, *monde = NULL ;
     SDL_Rect posMenu, pos_jouer, pos_options, pos_quitter, posTexte, pos_retour;
 
 
-    SDL_Event event1 ; 
+    SDL_Event event1 ;
     int menuBoolean = 1;  //pour savoir quand quitter
     int afficher = 1 ; //pour ne pas afficher le menu a l'interrieur d'option
     //position du fond
-    posMenu.x = 0; 
-    posMenu.y = 0;   
+    posMenu.x = 0;
+    posMenu.y = 0;
 
     // position du bouton jouer
     pos_jouer.x = 213 ;
@@ -60,9 +60,9 @@ int main(int argc, char *argv[])
     // position du bouton retour (dans option)
     pos_retour.x = 520 ;
     pos_retour.y = 270 ;
-     
-    /*Initialisation de le SDL*/  
-    SDL_Init(SDL_INIT_VIDEO);    
+
+    /*Initialisation de le SDL*/
+    SDL_Init(SDL_INIT_VIDEO);
 
     /*Initialisation de ttf*/
     TTF_Init();
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     TTF_Font *police = NULL;
 
     void affiche_texte(){
-        police = TTF_OpenFont("Alioli-Regular.ttf", 50) ;
+        police = TTF_OpenFont("assets/texture/Alioli-Regular.ttf", 50) ;
         SDL_Color couleurNoire = {0, 0, 0};
         texte = TTF_RenderText_Blended(police,chaine1, couleurNoire);
         // position pour afficher la premiere ligne de texte
@@ -94,58 +94,58 @@ int main(int argc, char *argv[])
         SDL_SetColorKey(barre_options, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(barre_options->format, 153,217,234));
         SDL_SetColorKey(barre_jouer, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(barre_jouer->format, 153,217,234));
         SDL_SetColorKey(barre_quitter, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(barre_quitter->format, 153,217,234));
-        
+
         SDL_BlitSurface(menu,NULL,ecran,&posMenu);
-        SDL_BlitSurface(barre_jouer,NULL,ecran,&pos_jouer);  
-        SDL_BlitSurface(barre_quitter,NULL,ecran,&pos_quitter);  
+        SDL_BlitSurface(barre_jouer,NULL,ecran,&pos_jouer);
+        SDL_BlitSurface(barre_quitter,NULL,ecran,&pos_quitter);
         SDL_BlitSurface(barre_options,NULL,ecran,&pos_options) ;
     }
 
     /*Initialisation de l'écran*/
-    ecran = SDL_SetVideoMode(WIDTH, HEIGHT, 32, SDL_HWSURFACE | SDL_DOUBLEBUF); 
+    ecran = SDL_SetVideoMode(WIDTH, HEIGHT, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
     SDL_FillRect(ecran, NULL, SDL_MapRGB(ecran->format, 255, 255, 255)) ;
-     
+
     /*Chargement des sprites*/
-    menu = SDL_LoadBMP("fond.bmp") ;
-    barre_options = SDL_LoadBMP("barre_options.bmp") ;
-    barre_quitter = SDL_LoadBMP("barre_quitter.bmp") ;
-    barre_jouer = SDL_LoadBMP("barre_jouer.bmp") ;
-    retour = SDL_LoadBMP("retour_final.bmp") ;
+    menu = SDL_LoadBMP("assets/texture/fond.bmp") ;
+    barre_options = SDL_LoadBMP("assets/texture/barre_options.bmp") ;
+    barre_quitter = SDL_LoadBMP("assets/texture/barre_quitter.bmp") ;
+    barre_jouer = SDL_LoadBMP("assets/texture/barre_jouer.bmp") ;
+    retour = SDL_LoadBMP("assets/texture/retour_final.bmp") ;
 
     // transparence du bouton de retour
     SDL_SetColorKey(retour, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(barre_options->format, 153,217,234));
 
     // affiche le menu (fond + boutons)
     affiche_menu(menu, barre_jouer, barre_quitter, barre_options) ;
-    
+
     /*Nom fenetre */
-    SDL_WM_SetCaption("Jeu programmation avancée", NULL);     
-    
-    /*Permission des événements à répétitions*/ 
-    SDL_EnableKeyRepeat(10, 10) ;      
+    SDL_WM_SetCaption("Jeu programmation avancée", NULL);
+
+    /*Permission des événements à répétitions*/
+    SDL_EnableKeyRepeat(10, 10) ;
 
     int x, y ; // coordonnées de la souris
-  
-    int dans_option = 0 ;  // booleen 
+
+    int dans_option = 0 ;  // booleen
 
     while(menuBoolean){
-        SDL_WaitEvent(&event1); 
-        switch(event1.type){    
-            
-            case SDL_MOUSEBUTTONDOWN : 
-              // recupere les coordonnees de la souris 
-              SDL_GetMouseState(&x, &y);   
-              // si clique sur le bouton jouer
-              if(y>=32 && y <= 72 && x>=213 && x<=454 && !dans_option) {     
+        SDL_WaitEvent(&event1);
+        switch(event1.type){
 
-                jouer(); 
+            case SDL_MOUSEBUTTONDOWN :
+              // recupere les coordonnees de la souris
+              SDL_GetMouseState(&x, &y);
+              // si clique sur le bouton jouer
+              if(y>=32 && y <= 72 && x>=213 && x<=454 && !dans_option) {
+
+                jouer();
                 dans_option = 0 ;
                 afficher = 1 ;
               }
               // si clique sur le bouton option
               if(y>=132 && y<=172 && x>=213 && x<=454){
                 SDL_BlitSurface(menu,NULL,ecran,&posMenu);
-                SDL_BlitSurface(retour,NULL,ecran,&pos_retour);  
+                SDL_BlitSurface(retour,NULL,ecran,&pos_retour);
                 // empeche d'afficher le menu par dessus notre texte
                 afficher = 0 ;
                 // affiche le dernier score
@@ -165,21 +165,21 @@ int main(int argc, char *argv[])
                 dans_option = 0 ;
               }
               break;
-            
+
             case SDL_QUIT:
-              menuBoolean = 0;     
+              menuBoolean = 0;
               break;
-        }      
+        }
         // si booleen afficher == 1
         if(afficher){
             affiche_menu(menu, barre_jouer, barre_quitter, barre_options) ;
 
         }
-        SDL_Flip(ecran) ; 
+        SDL_Flip(ecran) ;
     }
 
-  
-          
+
+
     // libere les surfaces
     SDL_FreeSurface(menu);
     SDL_FreeSurface(ecran);
@@ -194,13 +194,13 @@ int main(int argc, char *argv[])
     TTF_CloseFont(police); /* Doit être avant TTF_Quit() */
     TTF_Quit(); // Arret de ttf
 
- 
+
 
     return EXIT_SUCCESS; // Fermeture du programme
 
 }
 
-      
+
 
 
 

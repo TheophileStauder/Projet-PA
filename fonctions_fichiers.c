@@ -10,8 +10,8 @@
 char** allouer_tab_2D(int n, int m){
 	int i;
 	char ** tab = malloc(n*sizeof(char*));
-	
-	
+
+
 	for(i = 0 ; i < n ; i++){
 		tab[i] = malloc(m*sizeof(char*));
 	}
@@ -43,27 +43,27 @@ void desallouer_tab_2D(char** tab, int n){
 
 void afficher_tab_2D(char** tab, int n, int m){
 	 int i , j;
-	 
+
 	 for (i = 0 ; i < n ; i++){
 		for( j = 0 ; j < m ; j ++){
 			printf("%d",tab[i][m] );
-		  
+
 		}
 	 }
 }
 
 
 char** lire_fichier(const char* nomFichier, int* continuer){
-	
+
 	int c , n = 0;
 	char** tab = allouer_tab_2D(13,6);
 	int i = 0;
 	int j = 0;
-	
+
 	FILE* ptrFichier = fopen(nomFichier, "r");
-	
-	if (ptrFichier==NULL)  
-		perror("Error opening file");  
+
+	if (ptrFichier==NULL)
+		perror("Error opening file");
 	else{
 
 		do{
@@ -73,29 +73,29 @@ char** lire_fichier(const char* nomFichier, int* continuer){
         }
 		    if(c=='\n'){
 		      printf("\n");
-		      i++; 
+		      i++;
 		      j = 0 ;
 		    }
-		   
+
 		    if(c!=10 && c!=-1){
 			     tab[i][j] = c;
 			     n++ ;
 		    }
 		     if(c!='\n'){
 		        j++ ;
-          }   
+          }
 		}while(c != EOF);
 
 	}
-	fclose(ptrFichier);  	
+	fclose(ptrFichier);
 	return tab;
-  
+
 }
 
 void ecrire_fichier(const char* nomFichier, char* chaine){
   FILE* ptrFichier = fopen(nomFichier, "w+");
-  if (ptrFichier==NULL){ 
-      perror("Erroropeningfile");  
+  if (ptrFichier==NULL){
+      perror("Erroropeningfile");
   }
   else{
     fputs(chaine, ptrFichier) ;
@@ -130,14 +130,14 @@ void afficherMap(char** map, SDL_Rect pos,SDL_Surface *ecran,SDL_Surface *terre,
 
 int peutDeplacerTankHaut(char** tab, SDL_Rect *posTank){
   int i,j,i2,j2,res;
-  
+
   i = ((posTank->y + 30 ) /32);
   j = ((posTank->x +4) /32) ;
   i2 = ((posTank->y + 30 ) /32);
   j2 = ((posTank->x +28) /32) ;
-  
+
   res = 1;
-  
+
   if(tab[i-1][j]=='1' || tab[i2-1][j2] == '1'){
     res = 0;
   }
@@ -148,7 +148,7 @@ int peutDeplacerTankHaut(char** tab, SDL_Rect *posTank){
 int peutDeplacerTankDroite(char** tab, SDL_Rect *posTank){
   int i,j,i2,j2,res;
 
-  
+
   i = ((posTank->y + 4) / 32)  ;
   j = (posTank->x /32) ;
   res = 1;
@@ -164,7 +164,7 @@ int peutDeplacerTankDroite(char** tab, SDL_Rect *posTank){
 
 int peutDeplacerTankBas(char** tab, SDL_Rect *posTank){
   int i,j,i2,j2,res;
-  
+
   i = (posTank->y + 2) / 32 ;
   j = ((posTank->x + 4)/ 32) ;
 
@@ -182,11 +182,11 @@ int peutDeplacerTankBas(char** tab, SDL_Rect *posTank){
 
 int peutDeplacerTankGauche(char** tab, SDL_Rect *posTank){
   int i,j,i2,j2,res;
-  
+
   i = (posTank->y + 4 )/ 32;
   j = (posTank->x + 30) / 32;
   i2 = (posTank->y + 28)/ 32;
-  j2 = (posTank->x + 30) / 32; 
+  j2 = (posTank->x + 30) / 32;
 
   res = 1;
 
@@ -209,9 +209,9 @@ SDL_Rect genereFlagPos(char** map,SDL_Rect posTank){
   int i = 0,j = 0;
   int peutPasPoserFlag = 1;
   SDL_Rect posFlag;
-  
+
   srand(time(NULL));
-    
+
   while(peutPasPoserFlag){
     if(map[i][j] == '0'){
       int x = posTank.x - (j*SIZE_SPRITE);
@@ -224,8 +224,8 @@ SDL_Rect genereFlagPos(char** map,SDL_Rect posTank){
       }
     }
     i = rand()%9+0;
-    j = rand()%19+0;    
-  }  
+    j = rand()%19+0;
+  }
 
   return posFlag;
 }
@@ -246,7 +246,7 @@ void afficherTour(SDL_Rect* tabPosTour,SDL_Surface *ecran,SDL_Surface *tour){
 
 
 int hasReached(tank_t tank, SDL_Rect posTank,SDL_Rect posFlag){
-    
+
     int iTank,jTank,iFlag,jFlag;
     int boolean = 0;
     jTank =  (posTank.x + (SIZE_SPRITE/2))/32;
@@ -316,7 +316,7 @@ int est_Touche(Tir* tabTir,SDL_Rect posTank){
 }
 
 SDL_Rect* genereTourPos(char** map){
-  
+
   int i1 = 0,j1 = 0;
   int i = 0,j = 0;
   int peutPasPoserTour;
@@ -333,7 +333,7 @@ SDL_Rect* genereTourPos(char** map){
       }
       i = rand()%9+0;
       j = rand()%19+0;
-      
+
     }
   }
 
@@ -359,70 +359,70 @@ void affiche_Explosion(SDL_Surface* explosion,SDL_Surface *ecran,SDL_Rect posTan
                 break ;
             case SDL_KEYDOWN :
                 switch(event.key.keysym.sym){
-                    case SDLK_UP : 
+                    case SDLK_UP :
 
-                    if(peutDeplacerTankHaut(map,posTank)){ 
-                      
+                    if(peutDeplacerTankHaut(map,posTank)){
+
                       *tank = *tank_haut;
                       tankSrc->y = 0;
                       if (tankSrc->x >191){
                          tankSrc->x = 0 ;
                       }
 
-                      tankSrc->x += SIZE_SPRITE;   
+                      tankSrc->x += SIZE_SPRITE;
                       posTank->y -= 2;
                     }
 
                     break ;
-                    
+
 
                     case SDLK_DOWN :
-                     
+
                       if(peutDeplacerTankBas(map,posTank)){
-                          
+
                           *tank = *tank_bas;
-                          tankSrc->y = 0;  
+                          tankSrc->y = 0;
 
                           if (tankSrc->x >191){
                            tankSrc->x = 0 ;
                           }
-                          tankSrc->x += SIZE_SPRITE; 
-                          posTank->y += 2;  
-                       
+                          tankSrc->x += SIZE_SPRITE;
+                          posTank->y += 2;
+
                       }
 
 
                         break ;
-                    case SDLK_RIGHT :  
-                    
+                    case SDLK_RIGHT :
 
-                      if(peutDeplacerTankDroite(map, posTank)){ 
-                          
+
+                      if(peutDeplacerTankDroite(map, posTank)){
+
                           *tank = *tank_droite;
-                          tankSrc->x = 0;  
+                          tankSrc->x = 0;
 
                           if (tankSrc->y >191){
                            tankSrc->y = 0 ;
                           }
-                          tankSrc->y += SIZE_SPRITE; 
-                          if (posTank->x <= WIDTH - SIZE_SPRITE){ 
+                          tankSrc->y += SIZE_SPRITE;
+                          if (posTank->x <= WIDTH - SIZE_SPRITE){
                             posTank->x += 2;
                           }
                       }
-                      
+
                     break ;
-                    
-                    case SDLK_LEFT :   
-                 
-                        if(peutDeplacerTankGauche(map, posTank)){  
-                              
+
+                    case SDLK_LEFT :
+
+                        if(peutDeplacerTankGauche(map, posTank)){
+
                             *tank = *tank_gauche;
                             tankSrc->x = 0;
-                            if (tankSrc->y >191){  
+                            if (tankSrc->y >191){
                               tankSrc->y = 0 ;
                             }
-                            tankSrc->y += SIZE_SPRITE;   
-                            posTank->x -= 2; 
+                            tankSrc->y += SIZE_SPRITE;
+                            posTank->x -= 2;
                         }
 
                     break ;
@@ -469,17 +469,17 @@ void est_mort(tank_t t){
   char res[4] ;
   res[0] = level[0] ;
   res[1] = monde[0] ;
-  ecrire_fichier("ecriture_fichier",res) ;
+  ecrire_fichier("log",res) ;
 
  }
 
 
 
 tank_t cons(){
-      
+
         tank_t a = (tank_t) malloc(sizeof(s_tank_t));
         a->level = 0;
         a->monde = 1 ;
-        return a ; 
+        return a ;
     }
 
