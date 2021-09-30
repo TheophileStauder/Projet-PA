@@ -4,7 +4,8 @@
 A 2D game made with the SDL library in C
 
 
-![Display Image](https://github.com/TheophileStauder/Projet-PA/tree/master/assets/texture/screen.png)
+![Display Image](https://github.com/TheophileStauder/Projet-PA/blob/master/assets/texture/screen.png)
+
 
 To run the project :
 (Make sure you have SDL install)
