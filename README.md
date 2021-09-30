@@ -2,7 +2,9 @@
 
 
 A 2D game with the SDL library in C
-![Screenshot](![Display Image](https://github.com/TheophileStauder/Projet-PA/tree/master/assets/texture/screen.png))
+
+
+![Display Image](https://github.com/TheophileStauder/Projet-PA/tree/master/assets/texture/screen.png)
 
 To run the project :
 (Make sur you have SDL install)
